@@ -4,15 +4,10 @@ RUN useradd appuser
 
 WORKDIR /app
 
-COPY requirements.txt .
-COPY containerinfo containerinfo
-COPY containerinfo.py .
-COPY config.py .
-COPY boot.sh .
+COPY . .
 RUN chmod +x ./boot.sh
 
 RUN pip install -r requirements.txt
-RUN pip install gunicorn
 
 RUN chown -R appuser:appuser /app
 
