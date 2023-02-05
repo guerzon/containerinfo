@@ -3,12 +3,20 @@
 
 Extract some information from containers using Python.
 
-## Development
+## Usage
+
+### Docker
+
+Build the image:
 
 ```bash
-VERSION=0.3
-docker build --platform linux/amd64 -t containerinfo:${VERSION} -t guerzon/containerinfo:${VERSION} .
-docker push guerzon/containerinfo:${VERSION}
+docker build --platform linux/amd64 -t containerinfo: .
+```
+
+Or use the pre-built image:
+
+```bash
+docker pull guerzon/containerinfo
 ```
 
 Export the following environment variables. For now the supported authentication method is bearer token.
@@ -18,13 +26,17 @@ Export the following environment variables. For now the supported authentication
 
 ```bash
 docker run --rm -p 5000:5000 -e KUBERNETES_SERVICE_HOST -e KUBERNETES_BEARER_TOKEN --name containerinfo guerzon/containerinfo:${VERSION}
+```
 
+Access the application:
+
+```bash
 curl -s http://localhost:5000/container-resources?pod-label=app.kubernetes.io/component=jenkins-master
 ```
 
-## Deployment using Helm
+### Helm chart
 
-TBD
+Todo.
 
 ## References
 
