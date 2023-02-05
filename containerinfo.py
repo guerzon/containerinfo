@@ -1,0 +1,1 @@
+from containerinfo import containerapp
