@@ -1,31 +1,91 @@
 
 # containerinfo
 
-Extract some information from containers using Python.
+This demo application written in Python extracts some information from containers across a Kubernetes cluster.
 
 ## Usage
 
+### Helm chart
+
+This service is destined to be ran in a Kubernetes cluster. Use this (TBD) Helm chart to deploy the application.
+
 ### Docker
 
-Build the image:
+You can also use Docker (or podman) to build and test locally.
 
-```bash
-docker build --platform linux/amd64 -t containerinfo: .
+The application was designed to run under a service account with cluster-wide permissions to read pods. An example `ClusterRole` and `ClusterRoleBinding` for such a service account is as follows:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: containerinfo
+  namespace: containerinfo
+  labels:
+    app.kubernetes.io/component: containerinfo
+rules:
+  - apiGroups: ["extensions", "apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get","list","watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["get","list","watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: containerinfo
+  labels:
+    app.kubernetes.io/component: containerinfo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: containerinfo
+subjects:
+- kind: ServiceAccount
+  name: containerinfo
+  namespace: containerinfo
 ```
 
-Or use the pre-built image:
+After [creating the service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), proceed as follows:
 
 ```bash
-docker pull guerzon/containerinfo
+# set the version, can be 'latest'
+export VERSION=1.0
+
+# build the image
+docker build --platform linux/amd64 -t containerinfo:${VERSION} .
+
+# or use the pre-built image:
+docker pull guerzon/containerinfo:${VERSION}
 ```
 
-Export the following environment variables. For now the supported authentication method is bearer token.
-
-- `KUBERNETES_SERVICE_HOST`: the IP address or domain name of the `https` endpoint for the Kubernetes API, example: **10.10.10.1**.
-- `KUBERNETES_BEARER_TOKEN`: Bearer token to authenticate to the Kubernetes API, example: **eyJhbGciOiJSUzI1NiIsIm...**
+You can create a local directory called `data` and put the CA certificate and token inside, as follows:
 
 ```bash
-docker run --rm -p 5000:5000 -e KUBERNETES_SERVICE_HOST -e KUBERNETES_BEARER_TOKEN --name containerinfo guerzon/containerinfo:${VERSION}
+lester:containerinfo lester$ tree data
+data
+|-- ca.crt
+|-- namespace
+`-- token
+
+1 directory, 3 files
+lester:containerinfo lester$
+```
+
+Run the container, mount the `data/` directory inside the container:
+
+```bash
+export KUBERNETES_SERVICE_HOST=<IP of the Kubernetes API>
+
+docker run --rm -p 5000:5000 \
+  -e KUBERNETES_SERVICE_HOST \
+  -v $(pwd)/data:/var/run/secrets/kubernetes.io/serviceaccount \
+  --name containerinfo \
+  guerzon/containerinfo:${VERSION}
 ```
 
 Access the application:
@@ -33,10 +93,6 @@ Access the application:
 ```bash
 curl -s http://localhost:5000/container-resources?pod-label=app.kubernetes.io/component=jenkins-master
 ```
-
-### Helm chart
-
-Todo.
 
 ## References
 
