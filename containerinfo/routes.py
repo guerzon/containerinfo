@@ -25,8 +25,8 @@ def container_resources():
     # set the kubernetes https endpoint
     configuration.host =  "https://" + containerapp.config['KUBERNETES_SERVICE_HOST']
     
-    # don't worry about the ca cert for now
-    configuration.verify_ssl = False
+    # specify the ca cert
+    configuration.ssl_ca_cert = containerapp.config['KUBERNETES_CA_CRT']
     
     # create an api client using the config object
     apiClient = client.ApiClient(configuration)
