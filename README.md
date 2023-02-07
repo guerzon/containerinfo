@@ -1,19 +1,19 @@
 
 # containerinfo
 
-This demo application written in Python extracts some information from containers across a Kubernetes cluster.
+This demo application written in Python extracts some information from pods and containers across a Kubernetes cluster using the Kubernetes API.
 
 ## Usage
 
 ### Helm chart
 
-This service is destined to be ran in a Kubernetes cluster. Use this (TBD) Helm chart to deploy the application.
+This service is designed to run in a Kubernetes cluster. Use this (TBD) Helm chart to deploy the application.
 
 ### Docker
 
 You can also use Docker (or podman) to build and test locally.
 
-The application was designed to run under a service account with cluster-wide permissions to read pods. An example `ClusterRole` and `ClusterRoleBinding` for such a service account is as follows:
+The Helm chart above creates a service account with cluster-wide permissions to read pods. The following `ClusterRole` and `ClusterRoleBinding` definitions can be used to create the service account:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -98,3 +98,11 @@ curl -s http://localhost:5000/container-resources?pod-label=app.kubernetes.io/co
 
 - <https://github.com/kubernetes-client/python/blob/master/kubernetes/README.md>
 - <https://raw.githubusercontent.com/kubernetes-client/python/master/kubernetes/docs/CoreV1Api.md>
+
+## License
+
+See [LICENSE](./LICENSE)
+
+## Author
+
+[Lester Guerzon](mailto:guerzon@proton.me)
