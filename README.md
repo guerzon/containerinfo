@@ -1,19 +1,19 @@
 
 # containerinfo
 
-This demo application written in Python extracts some information from pods and containers across a Kubernetes cluster using the Kubernetes API.
+This demo application written in Python extracts information from pods and containers across a Kubernetes cluster using the Kubernetes API.
 
 ## Usage
 
-### Helm chart
+### Kubernetes
 
-This service is designed to run in a Kubernetes cluster. Use this (TBD) Helm chart to deploy the application.
+This demo application, as described above, is supposed to run in a Kubernetes cluster. Use [this](https://github.com/guerzon/containerinfo-helm) Helm chart to deploy the application to Kubernetes.
 
 ### Docker
 
-You can also use Docker (or podman) to build and test locally.
+You can also use Docker (or `podman`) to build and test locally, or to run the app on a Docker host external to the Kubernetes cluster
 
-The Helm chart above creates a service account with cluster-wide permissions to read pods. The following `ClusterRole` and `ClusterRoleBinding` definitions can be used to create the service account:
+As a prerequisite, create a service account with permissions to read pod information. The following `ClusterRole` and `ClusterRoleBinding` definitions can be used to create the service account:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -53,14 +53,11 @@ subjects:
 After [creating the service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), proceed as follows:
 
 ```bash
-# set the version, can be 'latest'
-export VERSION=1.0
-
 # build the image
-docker build --platform linux/amd64 -t containerinfo:${VERSION} .
+docker build --platform linux/amd64 -t containerinfo .
 
 # or use the pre-built image:
-docker pull guerzon/containerinfo:${VERSION}
+docker pull guerzon/containerinfo
 ```
 
 You can create a local directory called `data` and put the CA certificate and token inside, as follows:
@@ -105,4 +102,4 @@ See [LICENSE](./LICENSE)
 
 ## Author
 
-[Lester Guerzon](mailto:guerzon@proton.me)
+[Lester Guerzon](mailto:lester.guerzon@outlook.com)
